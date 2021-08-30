@@ -17,7 +17,7 @@ app.post("/", async (req, res) => {
   const fetch_results = await fetch(api_url);
   const json = await fetch_results.json();
   const result = json.message.body.track_list;
-  console.log("dati della ricerca:", result);
+  console.log(result)
   res.send(result);
 });
 
