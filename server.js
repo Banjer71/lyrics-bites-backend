@@ -38,7 +38,7 @@ app.get("/post", (req, res) => {
 
 app.post("/api/song", async (req, res) => {
   const songSelected = req.body
-  await songSelected
-  console.log('the song is: ', songSelected)
-  res.send("tune to be saved into the database");
+  const lyric = await songSelected.lyric
+  console.log(songSelected.lyric)
+  res.json(lyric);
 });
