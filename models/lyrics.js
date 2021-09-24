@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const lyricsSchema = new mongoose.Schema(
   {
-    song: {
+    lyric: {
       type: String,
       required: true,
     },

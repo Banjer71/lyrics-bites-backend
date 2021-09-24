@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const fetch = require("node-fetch");
 const cors = require("cors");
 require("dotenv").config();
-const Lyrics = require('./models/lyrics');
+const Lyrics = require("./models/lyrics");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -17,28 +17,27 @@ mongoose
   .then(() => app.listen(PORT, () => console.log(`server running on ${PORT}`)))
   .catch((err) => console.log(err.message));
 
-app.get('/', (req, res) => {
-  res.send('hello davide')
-})
-
-app.get("/api/:artist", async (req, res) => {
-  const api_key = process.env.API_KEY;
-  const { artist } = req.params;
-  const api_url = `https://api.musixmatch.com/ws/1.1/track.search?q_artist=${artist}&page_size=4&page=1&f_has_lyrics=1&s_track_rating=desc&apikey=${api_key}`;
-  const fetch_results = await fetch(api_url);
-  const json = await fetch_results.json();
-  const result = json.message.body.track_list;
-  console.log(result);
-  res.send(result);
+app.get("/", (req, res) => {
+  res.send("hello davide");
 });
 
-app.get("/post", (req, res) => {
-  res.send("post davide");
+app.get("/all", async (req, res) => {
+  const allSongs = await Lyrics.find({});
+  console.log("all the lyrcs: ", allSongs);
+  res.json(allSongs);
 });
 
 app.post("/api/song", async (req, res) => {
-  const songSelected = req.body
-  const lyric = await songSelected.lyric
-  console.log(songSelected.lyric)
+  const lyric = req.body;
+  const newSong = new Lyrics(lyric);
+  await newSong.save();
+  console.log(newSong);
   res.json(lyric);
+});
+
+app.get("/api/song/:id", async (req, res) => {
+  const { id } = req.params;
+  const song = await Lyrics.findById(id);
+  console.log(song);
+  res.json(song);
 });
