@@ -29,10 +29,11 @@ app.get("/all", async (req, res) => {
 
 app.post("/api/song", async (req, res) => {
   const lyric = req.body;
+  console.log("from the BE: ", lyric);
   const newSong = new Lyrics(lyric);
   await newSong.save();
-  console.log(newSong);
-  res.json(lyric);
+  console.log("dati salvati: ", newSong);
+  res.json(newSong);
 });
 
 app.get("/api/song/:id", async (req, res) => {
