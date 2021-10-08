@@ -42,3 +42,13 @@ app.get("/api/song/:id", async (req, res) => {
   console.log(song);
   res.json(song);
 });
+
+app.delete('/api/song/:id', async (req, res) => {
+  const { id } = req.params;
+  console.log('dataToBeDeleted: ', id)
+  await Lyrics.findByIdAndDelete(id)
+})
+
+app.delete('/all', async (req, res) => {
+  await Lyrics.deleteMany({})
+})
