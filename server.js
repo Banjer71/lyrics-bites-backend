@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(`${process.env.DB_CONNECTION_URL}/lyrcsPage`)
-  .then(() => app.listen(PORT, () => console.log(`server running on ${PORT}`)))
+  .then(() => app.listen(PORT, async () => await console.log(`server running on ${PORT}`)))
   .catch((err) => console.log(err.message));
 
 app.get("/", (req, res) => {
