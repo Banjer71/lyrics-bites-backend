@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 5000;
 
 mongoose
   .connect(`${process.env.DB_CONNECTION_URL}/lyrcsPage`)
-  .then(() => app.listen(PORT, () => console.log(`server running on ${PORT}`)))
   .catch((err) => console.log(err.message));
 
 app.get("/", (req, res) => {
@@ -47,3 +46,6 @@ app.delete("/api/song/:id", async (req, res) => {
 app.delete("/all", async (req, res) => {
   await Lyrics.deleteMany({});
 });
+
+
+app.listen(PORT, () => console.log(`server running on ${PORT}`))
