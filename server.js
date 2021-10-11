@@ -13,7 +13,7 @@ app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(`mongodb+srv://banjer:Estate%40Taranto21@cluster0.9jvnt.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`)
+  .connect(`${process.env.DB_CONNECTION_URL}`)
   .catch((err) => console.log(err.message));
 
 app.get("/", (req, res) => {
