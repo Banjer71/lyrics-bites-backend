@@ -13,7 +13,7 @@ app.use(cors());
 const PORT = process.env.PORT || 5000;
 
 mongoose
-  .connect(`${process.env.DB_CONNECTION_URL}/lyrcsPage`)
+  .connect(`${process.env.DB_CONNECTION_URL}`)
   .catch((err) => console.log(err.message));
 
 app.get("/", (req, res) => {
