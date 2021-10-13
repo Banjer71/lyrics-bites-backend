@@ -22,7 +22,7 @@ const lyricsSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    songName: {
+    songTitle: {
       type: String,
       required: true,
     },

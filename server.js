@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const fetch = require("node-fetch");
 const axios = require("axios");
 const cors = require("cors");
+const nodemailer = require('nodemailer');
 require("dotenv").config();
 const Lyrics = require("./models/lyrics");
 
@@ -50,5 +51,38 @@ app.delete("/all", async (req, res) => {
   const deleteAll = await Lyrics.deleteMany({});
   res.json(deleteAll)
 });
+
+app.get('/send_email/:lyrcs', async (req, res) => {
+  const {lyrcs} = req.params
+  console.log(lyrcs)
+  const transporter = nodemailer.createTransport({
+    service: process.env.HOST,
+    secure: true,
+    auth: {
+      user: process.env.USER,
+      pass: process.env.PASSWORD
+    }
+  });
+
+  let messageOptions = {
+    from: process.env.MAIL_FROM,
+    to: process.env.USER,
+    subject: 'schedule email',
+    text: lyrcs
+  }
+  
+  await transporter.sendMail(messageOptions, (error, info) => {
+    if (error) {
+      throw error
+    } else {
+      console.log('Email successfully sent!!!')
+    }
+  });
+
+})
+
+
+
+
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
