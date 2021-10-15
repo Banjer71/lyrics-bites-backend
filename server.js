@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const fetch = require("node-fetch");
 const axios = require("axios");
 const cors = require("cors");
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 require("dotenv").config();
 const Lyrics = require("./models/lyrics");
 
@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
   res.send("hello Davide");
 });
 
-app.get("/all", async (req, res) => {
+app.get("/api/all", async (req, res) => {
   const allSongs = await Lyrics.find({});
   res.json(allSongs);
 });
@@ -44,45 +44,48 @@ app.get("/api/song/:id", async (req, res) => {
 app.delete("/api/song/:id", async (req, res) => {
   const { id } = req.params;
   const deleteItem = await Lyrics.findByIdAndDelete(id);
-  res.json(deleteItem)
+  res.json(deleteItem);
 });
 
-app.delete("/all", async (req, res) => {
+app.delete("/api/all", async (req, res) => {
   const deleteAll = await Lyrics.deleteMany({});
-  res.json(deleteAll)
+  res.json(deleteAll);
 });
 
-app.get('/send_email/:lyrcs', async (req, res) => {
-  const {lyrcs} = req.params
-  console.log(lyrcs)
+app.get("/api/send_email/:lyrcs", async (req, res) => {
+  const { lyrcs } = req.params;
+  console.log(lyrcs);
   const transporter = nodemailer.createTransport({
     service: process.env.HOST,
     secure: true,
     auth: {
       user: process.env.USER,
-      pass: process.env.PASSWORD
-    }
+      pass: process.env.PASSWORD,
+    },
   });
 
   let messageOptions = {
     from: process.env.MAIL_FROM,
-    to: process.env.USER,
-    subject: 'schedule email',
-    text: lyrcs
-  }
-  
+    to: process.env.USER2,
+    subject: "schedule email",
+    html: `<div
+    style="
+    font-family:monospace;
+    margin: 0 auto;
+    max-width: 400px;
+    text-align: center;
+    line-height: 2">
+    ${lyrcs}
+    </div>`,
+  };
+
   await transporter.sendMail(messageOptions, (error, info) => {
     if (error) {
-      throw error
+      throw error;
     } else {
-      console.log('Email successfully sent!!!')
+      console.log("Email successfully sent!!!");
     }
   });
-
-})
-
-
-
-
+});
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
