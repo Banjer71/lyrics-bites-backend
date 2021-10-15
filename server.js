@@ -56,6 +56,7 @@ app.get("/api/send_email/:lyrcs", async (req, res) => {
   const { lyrcs } = req.params;
   console.log(lyrcs);
   const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
     service: process.env.HOST,
     secure: true,
     auth: {
