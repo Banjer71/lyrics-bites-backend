@@ -11,11 +11,6 @@ const Lyrics = require("./models/lyrics");
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
-app.use((request, response, next) => {
-  response.header("Access-Control-Allow-Origin", "*");
-  response.header("Access-Control-Allow-Headers", "Content-Type");
-  next();
-});
 
 const PORT = process.env.PORT || 5000;
 
@@ -65,7 +60,7 @@ app.get("/api/send_email/:lyrcs", async (req, res) => {
     service: process.env.HOST,
     secure: true,
     auth: {
-      user: process.env.USER,
+      user: process.env.MAIL_FROM,
       pass: process.env.PASSWORD,
     },
   });
