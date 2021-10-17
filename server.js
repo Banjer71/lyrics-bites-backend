@@ -52,7 +52,7 @@ app.delete("/api/all", async (req, res) => {
   res.json(deleteAll);
 });
 
-app.get("/send_email/:lyrcs", async (req, res) => {
+app.get("/api/send_email/:lyrcs", async (req, res) => {
   const { lyrcs } = req.params;
   console.log(lyrcs);
   const transporter = nodemailer.createTransport({
