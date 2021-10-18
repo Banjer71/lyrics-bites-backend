@@ -23,43 +23,43 @@ app.get("/", (req, res) => {
   res.send("hello Davide");
 });
 
-app.get("/api/all", async (req, res) => {
+app.get("/v.1/api/all", async (req, res) => {
   const allSongs = await Lyrics.find({});
   res.json(allSongs);
 });
 
-app.post("/api/song", async (req, res) => {
+app.post("/v.1/api/song", async (req, res) => {
   const lyric = req.body;
   const newSong = new Lyrics(lyric);
   await newSong.save();
   res.json(newSong);
 });
 
-app.get("/api/song/:id", async (req, res) => {
+app.get("/v.1/api/song/:id", async (req, res) => {
   const { id } = req.params;
   const song = await Lyrics.findById(id);
   res.json(song);
 });
 
-app.delete("/api/song/:id", async (req, res) => {
+app.delete("/v.1/api/song/:id", async (req, res) => {
   const { id } = req.params;
   const deleteItem = await Lyrics.findByIdAndDelete(id);
   res.json(deleteItem);
 });
 
-app.delete("/api/all", async (req, res) => {
+app.delete("/v.1/api/all", async (req, res) => {
   const deleteAll = await Lyrics.deleteMany({});
   res.json(deleteAll);
 });
 
-app.get("/api/send_email/:lyrcs", async (req, res) => {
+app.get("/v.1/api/send_email/:lyrcs", async (req, res) => {
   const { lyrcs } = req.params;
   console.log(lyrcs);
   const transporter = nodemailer.createTransport({
     service: process.env.HOST,
     secure: true,
     auth: {
-      user: process.env.MAIL_FROM,
+      user: process.env.USER,
       pass: process.env.PASSWORD,
     },
   });
