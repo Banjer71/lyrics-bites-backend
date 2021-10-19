@@ -52,9 +52,9 @@ app.delete("/v.1/api/all", async (req, res) => {
   res.json(deleteAll);
 });
 
-app.get("/v.1/api/send_email/:lyrcs", async (req, res) => {
-  const { lyrcs } = req.params;
-  console.log(lyrcs);
+app.post("/v.1/api/send_email", async (req, res) => {
+  const { lyrics, songTitle } = req.body;
+
   const transporter = nodemailer.createTransport({
     service: process.env.HOST,
     secure: true,
@@ -75,7 +75,8 @@ app.get("/v.1/api/send_email/:lyrcs", async (req, res) => {
     max-width: 400px;
     text-align: center;
     line-height: 2">
-    ${lyrcs}
+    <h2>${songTitle}</h2>
+    ${lyrics}
     </div>`,
   };
 
@@ -86,6 +87,7 @@ app.get("/v.1/api/send_email/:lyrcs", async (req, res) => {
       console.log("Email successfully sent!!!");
     }
   });
+  res.json(lyrics);
 });
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
