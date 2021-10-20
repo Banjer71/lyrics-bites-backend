@@ -53,7 +53,7 @@ app.delete("/v.1/api/all", async (req, res) => {
 });
 
 app.post("/v.1/api/send_email", async (req, res) => {
-  const { lyrics, songTitle } = req.body;
+  const { lyrics, songTitle, artist } = req.body;
 
   const transporter = nodemailer.createTransport({
     service: process.env.HOST,
@@ -76,6 +76,7 @@ app.post("/v.1/api/send_email", async (req, res) => {
     text-align: center;
     line-height: 2">
     <h2>${songTitle}</h2>
+    <h3>by ${artist}</h3>
     ${lyrics}
     </div>`,
   };
@@ -85,9 +86,9 @@ app.post("/v.1/api/send_email", async (req, res) => {
       throw error;
     } else {
       console.log("Email successfully sent!!!");
+      res.json({ status: "lyrics has been sent correctly!!!" });
     }
   });
-  res.json(lyrics);
 });
 
 app.listen(PORT, () => console.log(`server running on ${PORT}`));
