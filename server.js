@@ -52,6 +52,25 @@ app.delete("/v.1/api/all", async (req, res) => {
   res.json(deleteAll);
 });
 
+app.post("/v.1/api/delete/:ids", (req, res) => {
+  const ids = req.body;
+  console.log(ids);
+  Lyrics.deleteMany(
+    {
+      _id: {
+        $in: ids,
+      },
+    },
+    () => (err, result) => {
+      if (err) {
+        res.send(err);
+      } else {
+        res.send(result);
+      }
+    }
+  );
+});
+
 app.post("/v.1/api/send_email", async (req, res) => {
   const { lyrics, songTitle, artist } = req.body;
 
