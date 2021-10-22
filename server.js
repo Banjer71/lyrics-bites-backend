@@ -52,7 +52,7 @@ app.delete("/v.1/api/all", async (req, res) => {
   res.json(deleteAll);
 });
 
-app.post("/v.1/api/delete/:ids", (req, res) => {
+app.post("/v.1/api/delete", (req, res) => {
   const ids = req.body;
   console.log(ids);
   Lyrics.deleteMany(
@@ -69,6 +69,7 @@ app.post("/v.1/api/delete/:ids", (req, res) => {
       }
     }
   );
+  res.json("song deleted");
 });
 
 app.post("/v.1/api/send_email", async (req, res) => {
