@@ -33,11 +33,19 @@ app.post("/v.1/api/song", async (req, res) => {
   const { trackId, songTitle } = lyric;
   const songExist = await Lyrics.exists({ trackId: trackId });
   if (songExist) {
-    res.json({ message: `${songTitle} already exist in the db` });
+    res.json({
+      type: "EXIST",
+      id: "exist",
+      message: `${songTitle} already exist in the db`,
+    });
   } else {
     const newSong = new Lyrics(lyric);
     await newSong.save();
-    res.json({ message: `${songTitle} has been successfully added to the db` });
+    res.json({
+      type: "SUCCESS",
+      id: "saved",
+      message: `${songTitle} has been successfully added to the db`,
+    });
   }
 });
 
