@@ -124,7 +124,6 @@ app.post("/v.1/api/signup", async (req, res) => {
 });
 
 app.post("/v.1/api/song", async (req, res) => {
-  const lyric = req.body;
   const {
     words,
     trackId,
@@ -134,7 +133,7 @@ app.post("/v.1/api/song", async (req, res) => {
     artistName,
     artistId,
     userEmail,
-  } = lyric;
+  } = req.body;
   const userInfo = await User.find({ email: userEmail });
   const userId = userInfo[0]._id;
   const userIdExist = await Lyrics.exists({
