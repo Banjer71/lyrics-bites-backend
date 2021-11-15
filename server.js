@@ -1,12 +1,14 @@
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
-const fetch = require("node-fetch");
-const axios = require("axios");
 const cors = require("cors");
+const jwtDecode = require("jwt-decode");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+const User = require("./models/user");
 const Lyrics = require("./models/lyrics");
+
+const { createToken, hashPassword, verifyPassword } = require("./utils");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -23,30 +25,155 @@ app.get("/", (req, res) => {
   res.send("hello Davide");
 });
 
-app.get("/v.1/api/all", async (req, res) => {
-  const allSongs = await Lyrics.find({});
-  res.json(allSongs);
+app.post("/v.1/api/authenticate", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({
+      email,
+    }).lean();
+
+    if (!user) {
+      return res.status(403).json({
+        message: "Wrong email or password.",
+      });
+    }
+
+    const passwordValid = await verifyPassword(password, user.password);
+
+    if (passwordValid) {
+      const { password, bio, ...rest } = user;
+      const userInfo = Object.assign({}, { ...rest });
+
+      const token = createToken(userInfo);
+
+      const decodedToken = jwtDecode(token);
+      const expiresAt = decodedToken.exp;
+
+      res.json({
+        message: "Authentication successful!",
+        token,
+        userInfo,
+        expiresAt,
+      });
+    } else {
+      res.status(403).json({
+        message: "Wrong email or password.",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ message: "Something went wrong." });
+  }
+});
+
+app.post("/v.1/api/signup", async (req, res) => {
+  try {
+    const { email, firstName, lastName } = req.body;
+    console.log(req.body);
+
+    const hashedPassword = await hashPassword(req.body.password);
+
+    const userData = {
+      email: email.toLowerCase(),
+      firstName,
+      lastName,
+      password: hashedPassword,
+    };
+
+    const existingEmail = await User.findOne({
+      email: userData.email,
+    }).lean();
+
+    if (existingEmail) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    const newUser = new User(userData);
+    const savedUser = await newUser.save();
+
+    if (savedUser) {
+      const token = createToken(savedUser);
+      const decodedToken = jwtDecode(token);
+      const expiresAt = decodedToken.exp;
+
+      const { firstName, lastName, email } = savedUser;
+
+      const userInfo = {
+        firstName,
+        lastName,
+        email,
+      };
+
+      return res.json({
+        message: "User created!",
+        token,
+        userInfo,
+        expiresAt,
+      });
+    } else {
+      return res.status(400).json({
+        message: "There was a problem creating your account",
+      });
+    }
+  } catch (err) {
+    return res.status(400).json({
+      message: "There was a problem creating your account",
+    });
+  }
 });
 
 app.post("/v.1/api/song", async (req, res) => {
-  const lyric = req.body;
-  const { trackId, songTitle } = lyric;
-  const songExist = await Lyrics.exists({ trackId: trackId });
-  if (songExist) {
+  const {
+    words,
+    trackId,
+    songTitle,
+    album_id,
+    album,
+    artistName,
+    artistId,
+    userEmail,
+  } = req.body;
+  const userInfo = await User.find({ email: userEmail });
+  const userId = userInfo[0]._id;
+  const userIdExist = await Lyrics.exists({
+    $and: [{ trackId: trackId }, { _user: userId }],
+  });
+
+  if (userIdExist) {
     res.json({
       type: "EXIST",
       id: "exist",
+      _id: userId,
       message: `${songTitle} already exist in the db`,
     });
   } else {
-    const newSong = new Lyrics(lyric);
+    const newSong = new Lyrics({
+      album_id,
+      album,
+      trackId,
+      artistName,
+      artistId,
+      songTitle,
+      words,
+      dataSaved: Date.now(),
+      _user: userId,
+    });
+    console.log(newSong);
     await newSong.save();
     res.json({
       type: "SUCCESS",
       id: "saved",
+      _id: userId,
       message: `${songTitle} has been successfully added to the db`,
     });
   }
+});
+
+app.get("/v.1/api/all/:email", async (req, res) => {
+  const userInfo = await User.find({ email: req.params.email });
+  const allSongs = await Lyrics.find({ _user: userInfo });
+  res.json(allSongs);
 });
 
 app.get("/v.1/api/song/:id", async (req, res) => {
@@ -61,8 +188,10 @@ app.delete("/v.1/api/song/:id", async (req, res) => {
   res.json(deleteItem);
 });
 
-app.delete("/v.1/api/all", async (req, res) => {
-  const deleteAll = await Lyrics.deleteMany({});
+app.delete("/v.1/api/all/:email", async (req, res) => {
+  const userInfo = await User.find({ email: req.params.email });
+  const userId = userInfo[0]._id;
+  const deleteAll = await Lyrics.deleteMany({ _user: userId });
   res.json(deleteAll);
 });
 
