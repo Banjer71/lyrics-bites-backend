@@ -216,7 +216,7 @@ app.post("/v.1/api/delete", (req, res) => {
 });
 
 app.post("/v.1/api/send_email", async (req, res) => {
-  const { lyrics, songTitle, artist } = req.body;
+  const { lyrics, songTitle, artist, userEmail } = req.body;
 
   const transporter = nodemailer.createTransport({
     service: process.env.HOST,
@@ -229,7 +229,7 @@ app.post("/v.1/api/send_email", async (req, res) => {
 
   let messageOptions = {
     from: process.env.MAIL_FROM,
-    to: process.env.USER2,
+    to: userEmail,
     subject: "schedule email",
     html: `<div
     style="
